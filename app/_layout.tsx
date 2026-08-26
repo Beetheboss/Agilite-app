@@ -1,10 +1,18 @@
+import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 
 import { CollectionStoreProvider } from "@/lib/collection-store";
 import { ThemeProvider } from "@/lib/theme-provider";
 
+void SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+  useEffect(() => {
+    void SplashScreen.hideAsync();
+  }, []);
+
   return (
     <ThemeProvider>
       <CollectionStoreProvider>

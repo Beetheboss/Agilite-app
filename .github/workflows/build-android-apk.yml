@@ -63,16 +63,16 @@ jobs:
               -dname "CN=Android Debug,O=Android,C=US"
           fi
 
-      - name: Build debug APK with Gradle
+      - name: Build bundled release APK with Gradle
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace --console=plain --max-workers=2
+        run: ./gradlew assembleRelease --no-daemon --stacktrace --console=plain --max-workers=2
         env:
           GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx3g -Dkotlin.daemon.jvm.options=-Xmx1536m
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: agilite-collection-tracker-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: agilite-collection-tracker-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
