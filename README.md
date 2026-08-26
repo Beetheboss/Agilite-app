@@ -13,7 +13,7 @@ The app remains built with Expo SDK 54 internally, but this repository includes 
 5. Open the completed workflow run, scroll to **Artifacts**, and download `agilite-collection-tracker-debug-apk`.
 6. Extract the downloaded ZIP and install `app-debug.apk` on your Android device. Android may require permission to install apps from the browser or file manager.
 
-This workflow intentionally creates a **debug APK**. It is appropriate for personal use and direct sharing with trusted people. A signed release APK for broader distribution would require adding an Android keystore and GitHub Actions secrets.
+This workflow intentionally creates a **debug APK** targeting `arm64-v8a`, the architecture used by most current Android phones and tablets. It is appropriate for personal use and direct sharing with trusted people. Very old 32-bit-only Android devices are not targeted. A signed release APK for broader distribution would require adding an Android keystore and GitHub Actions secrets.
 
 ## Local development
 
