@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-android-apk:
@@ -76,3 +76,38 @@ jobs:
           path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: agilite-tracker-v1.0.5-build-${{ github.run_number }}
+          name: Agilite Tracker 1.0.5 (Build ${{ github.run_number }})
+          body: |
+            Direct Android APK for personal use.
+
+            - Download `app-release.apk` below; it is not wrapped in a ZIP.
+            - Target ABI: arm64-v8a.
+            - Package: `com.app.agilitecollectiontracker`.
+          files: android/app/build/outputs/apk/release/app-release.apk
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write direct download URL
+        run: |
+          echo "https://github.com/${{ github.repository }}/releases/download/agilite-tracker-v1.0.5-build-${{ github.run_number }}/app-release.apk" > direct-apk-url.txt
+          cat direct-apk-url.txt
+
+      - name: Upload direct URL note
+        uses: actions/upload-artifact@v4
+        with:
+          name: agilite-tracker-direct-download-link
+          path: direct-apk-url.txt
+          retention-days: 30
+
+      - name: Summarize release link
+        run: |
+          {
+            echo "### Direct APK download"
+            echo "https://github.com/${{ github.repository }}/releases/download/agilite-tracker-v1.0.5-build-${{ github.run_number }}/app-release.apk"
+          } >> "$GITHUB_STEP_SUMMARY"
