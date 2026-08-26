@@ -49,6 +49,20 @@ jobs:
       - name: Verify the checked-in Android project
         run: test -f android/gradlew && test -f android/app/build.gradle
 
+      - name: Create ephemeral debug keystore
+        run: |
+          if [ ! -f android/app/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -storepass android \
+              -keypass android \
+              -keystore android/app/debug.keystore \
+              -alias androiddebugkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Build debug APK with Gradle
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon --stacktrace --console=plain --max-workers=2
