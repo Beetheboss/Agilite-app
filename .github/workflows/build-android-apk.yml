@@ -46,16 +46,14 @@ jobs:
       - name: Install JavaScript dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate the native Android project
-        run: pnpm exec expo prebuild --platform android --non-interactive
-        env:
-          CI: true
+      - name: Verify the checked-in Android project
+        run: test -f android/gradlew && test -f android/app/build.gradle
 
       - name: Build debug APK with Gradle
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace --console=plain
+        run: ./gradlew assembleDebug --no-daemon --stacktrace --console=plain --max-workers=2
         env:
-          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g -Dkotlin.daemon.jvm.options=-Xmx2g
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx3g -Dkotlin.daemon.jvm.options=-Xmx1536m
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

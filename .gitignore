@@ -40,7 +40,8 @@ app-example
 
 # generated native folders
 /ios
-/android
+# Keep the checked-in Android project; exclude local debug signing material.
+android/app/debug.keystore
 
 # IDE
 .vscode/
