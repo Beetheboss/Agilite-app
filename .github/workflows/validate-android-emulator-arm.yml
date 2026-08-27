@@ -1,0 +1,68 @@
+name: Validate Android APK on ARM64 emulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: GitHub Release tag to validate
+        required: true
+        default: agilite-tracker-v1.0.6-build-22
+      apk_name:
+        description: APK asset filename on that release
+        required: true
+        default: AgiliteTracker-1.0.6-build-22.apk
+
+permissions:
+  contents: read
+
+jobs:
+  validate-native-android-arm64:
+    name: Validate APK on ARM64 Android emulator
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+
+    steps:
+      - name: Enable KVM when available
+        run: |
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm
+            echo "KVM available"
+          else
+            echo "KVM unavailable; emulator will use its configured fallback"
+          fi
+
+      - name: Download selected Release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          APK_NAME: ${{ inputs.apk_name }}
+        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK_NAME" --dir emulator-apk
+
+      - name: Run APK on ARM64 Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: arm64-v8a
+          profile: pixel_2
+          force-avd-creation: true
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect
+          disable-animations: true
+          script: |
+            APK=$(find emulator-apk -type f -name '*.apk' -print -quit)
+            test -n "$APK"
+            timeout 120s adb wait-for-device
+            timeout 120s adb shell getprop sys.boot_completed
+            timeout 120s adb install -r "$APK"
+            adb shell am force-stop com.app.agilitecollectiontracker
+            adb shell monkey -p com.app.agilitecollectiontracker 1
+            sleep 5
+            adb exec-out screencap -p > native-dashboard-arm64.png
+
+      - name: Upload native ARM64 emulator screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: agilite-tracker-native-dashboard-arm64-screenshot
+          path: native-dashboard-arm64.png
+          if-no-files-found: error
+          retention-days: 30
