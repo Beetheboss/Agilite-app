@@ -1,0 +1,129 @@
+name: Validate source on x86 Android emulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Source commit or branch to build and validate
+        required: true
+        default: c1ce833dd84f2257e59f0cb383ef0c1244a53ce2
+
+permissions:
+  contents: read
+
+jobs:
+  validate-source-on-x86:
+    name: Build and run source on x86 Android emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create build provenance stamp
+        env:
+          SOURCE_REF: ${{ inputs.source_ref }}
+        run: |
+          set -euo pipefail
+          COMMIT=$(git rev-parse --short=7 HEAD)
+          cat > lib/build-stamp.ts <<EOF
+          /** Generated for native emulator validation. */
+          export const BUILD_STAMP = {
+            commit: "${COMMIT}",
+            run: "source-validation-${GITHUB_RUN_NUMBER}",
+            builtAt: "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          } as const;
+          EOF
+          grep -E 'commit:|run:|builtAt:' lib/build-stamp.ts
+
+      - name: Create local signing key
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/app/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000
+
+      - name: Bundle current JavaScript for x86
+        working-directory: android
+        run: ./gradlew :app:createBundleReleaseJsAndAssets -PreactNativeArchitectures=x86 --no-daemon --stacktrace --console=plain --max-workers=2
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx3g -Dkotlin.daemon.jvm.options=-Xmx1536m
+
+      - name: Build validation APK for x86
+        working-directory: android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=x86 --no-daemon --stacktrace --console=plain --max-workers=2
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=-Xmx3g -Dkotlin.daemon.jvm.options=-Xmx1536m
+
+      - name: Expose validation APK path
+        run: |
+          set -euo pipefail
+          APK_PATH="$GITHUB_WORKSPACE/android/app/build/outputs/apk/release/app-release.apk"
+          test -f "$APK_PATH"
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+          ls -lh "$APK_PATH"
+
+      - name: Upload x86 validation APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: agilite-tracker-x86-validation-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Run x86 validation APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86
+          profile: Nexus 5
+          force-avd-creation: true
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-snapshot-load
+          disable-animations: true
+          script: |
+            test -f "$APK_PATH"
+            adb install -r "$APK_PATH"
+            adb shell am force-stop com.app.agilitecollectiontracker
+            adb shell monkey -p com.app.agilitecollectiontracker 1
+            sleep 8
+            adb shell dumpsys window windows > "$GITHUB_WORKSPACE/native-window-dump.txt"
+            adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-x86.png"
+
+      - name: Upload native emulator evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: agilite-tracker-native-x86-evidence
+          path: |
+            native-dashboard-x86.png
+            native-window-dump.txt
+          if-no-files-found: error
+          retention-days: 30
