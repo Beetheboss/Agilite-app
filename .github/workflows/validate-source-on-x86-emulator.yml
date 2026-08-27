@@ -114,9 +114,10 @@ jobs:
             adb install -r "$APK_PATH"
             adb shell am force-stop com.app.agilitecollectiontracker
             adb shell monkey -p com.app.agilitecollectiontracker 1
-            sleep 15
+            sleep 30
             adb shell dumpsys activity activities | grep -m1 'mResumedActivity' || true
             adb shell dumpsys window windows > "$GITHUB_WORKSPACE/native-window-dump.txt"
+            adb logcat -d -v threadtime > "$GITHUB_WORKSPACE/native-logcat.txt"
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-x86.png"
 
       - name: Upload native emulator evidence
@@ -126,5 +127,6 @@ jobs:
           path: |
             native-dashboard-x86.png
             native-window-dump.txt
+            native-logcat.txt
           if-no-files-found: error
           retention-days: 30
