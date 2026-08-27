@@ -114,15 +114,8 @@ jobs:
             adb install -r "$APK_PATH"
             adb shell am force-stop com.app.agilitecollectiontracker
             adb shell monkey -p com.app.agilitecollectiontracker 1
-            for attempt in $(seq 1 30); do
-              RESUMED=$(adb shell dumpsys activity activities | grep -m1 'mResumedActivity' || true)
-              echo "resumed[$attempt]=$RESUMED"
-              case "$RESUMED" in
-                *com.app.agilitecollectiontracker*) break ;;
-              esac
-              sleep 1
-            done
-            sleep 3
+            sleep 15
+            adb shell dumpsys activity activities | grep -m1 'mResumedActivity' || true
             adb shell dumpsys window windows > "$GITHUB_WORKSPACE/native-window-dump.txt"
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-x86.png"
 
