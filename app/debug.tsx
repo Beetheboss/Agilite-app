@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Appearance,
   AppState,
+  Dimensions,
   I18nManager,
   Platform,
   Pressable,
@@ -16,7 +17,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { usePathname } from "expo-router";
+import { usePathname, useSegments } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenContainer } from "@/components/screen-container";
@@ -67,7 +68,7 @@ function safeJson(value: unknown) {
 export default function DebugScreen() {
   const colors = useColors();
   const { colorScheme } = useThemeContext();
-  const { records, statuses, ready } = useCollectionStore();
+  const { records, statuses, linkOverrides, ready } = useCollectionStore();
   const [storageInfo, setStorageInfo] = useState({
     statusPresent: false,
     keyCount: 0,
@@ -76,9 +77,11 @@ export default function DebugScreen() {
     error: "none",
   });
   const [refreshedAt, setRefreshedAt] = useState(() => new Date());
+  const [storageReadMs, setStorageReadMs] = useState<number | null>(null);
   const [appState, setAppState] = useState(AppState.currentState);
 
   const refreshStorage = useCallback(async () => {
+    const startedAt = Date.now();
     try {
       const [stored, keys] = await Promise.all([
         AsyncStorage.getItem(STATUS_KEY),
@@ -91,11 +94,13 @@ export default function DebugScreen() {
         knownKeys: keys.filter((key) => key.startsWith("agilite")).slice(0, 20),
         error: "none",
       });
+      setStorageReadMs(Date.now() - startedAt);
     } catch (error) {
       setStorageInfo((current) => ({
         ...current,
         error: error instanceof Error ? error.message : String(error),
       }));
+      setStorageReadMs(Date.now() - startedAt);
     }
     setRefreshedAt(new Date());
   }, []);
@@ -114,8 +119,10 @@ export default function DebugScreen() {
     [records, statuses],
   );
   const { width, height, scale, fontScale } = useWindowDimensions();
+  const screen = Dimensions.get("screen");
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
+  const routeSegments = useSegments();
   const nativeConstants = (Platform.constants ?? {}) as unknown as Record<
     string,
     unknown
@@ -123,6 +130,15 @@ export default function DebugScreen() {
   const reactNativeVersion = nativeConstants.reactNativeVersion
     ? safeJson(nativeConstants.reactNativeVersion)
     : "unavailable";
+  const nativeManufacturer = String(
+    nativeConstants.Manufacturer ?? nativeConstants.manufacturer ?? "unknown",
+  );
+  const nativeModel = String(
+    nativeConstants.Model ?? nativeConstants.model ?? "unknown",
+  );
+  const nativeBrand = String(
+    nativeConstants.Brand ?? nativeConstants.brand ?? "unknown",
+  );
   const config = Constants.expoConfig;
   const appUrl = Linking.createURL("/");
   const apiUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? "not configured";
@@ -159,11 +175,15 @@ export default function DebugScreen() {
         `Platform: ${Platform.OS} ${Platform.Version}`,
         `Device: ${deviceName}`,
         `Window: ${Math.round(width)}x${Math.round(height)} @${scale}x, font ${fontScale}x`,
+        `Screen: ${Math.round(screen.width)}x${Math.round(screen.height)}`,
         `Insets: top ${insets.top}, right ${insets.right}, bottom ${insets.bottom}, left ${insets.left}`,
         `App state/path: ${appState}/${pathname}`,
+        `Route segments: ${routeSegments.join("/") || "root"}`,
         `Catalog: ${records.length} records, ${linkCoverage.any} with a working regional link, ${linkCoverage.globallyLinkless} globally linkless`,
         `Statuses: Owned ${counts.Owned}, Verified ${counts.Verified}, Missing Link ${counts["Missing Link"]}, Not Found ${counts["Not Found"]}`,
-        `Storage: ${storageInfo.keyCount} keys, status present ${storageInfo.statusPresent}, ${storageInfo.serializedBytes} JSON bytes`,
+        `Storage: ${storageInfo.keyCount} keys, status present ${storageInfo.statusPresent}, ${storageInfo.serializedBytes} JSON bytes, read ${storageReadMs ?? "unknown"} ms`,
+        `Link overrides: ${Object.keys(linkOverrides).length} records`,
+        `Quick Actions: Pressable rows; Review gaps -> /catalog?status=Missing Link; Status board -> /statuses`,
         `Refreshed: ${refreshedAt.toISOString()}`,
       ].join("\n"),
     [
@@ -179,12 +199,17 @@ export default function DebugScreen() {
       insets.right,
       insets.top,
       linkCoverage,
+      linkOverrides,
       nativeBuild,
       nativeVersion,
       pathname,
       records.length,
       refreshedAt,
+      routeSegments,
       scale,
+      screen.height,
+      screen.width,
+      storageReadMs,
       storageInfo.keyCount,
       storageInfo.serializedBytes,
       storageInfo.statusPresent,
@@ -270,6 +295,9 @@ export default function DebugScreen() {
 
         <Section title="Android device">
           <DiagnosticRow label="Device name" value={deviceName} />
+          <DiagnosticRow label="Manufacturer" value={nativeManufacturer} />
+          <DiagnosticRow label="Brand" value={nativeBrand} />
+          <DiagnosticRow label="Model" value={nativeModel} />
           <DiagnosticRow
             label="OS / API level"
             value={`${Platform.OS} ${Platform.Version}`}
@@ -281,6 +309,14 @@ export default function DebugScreen() {
           <DiagnosticRow
             label="Window pixels"
             value={`${Math.round(width)} × ${Math.round(height)}`}
+          />
+          <DiagnosticRow
+            label="Screen pixels"
+            value={`${Math.round(screen.width)} × ${Math.round(screen.height)}`}
+          />
+          <DiagnosticRow
+            label="Window/screen delta"
+            value={`${Math.round(screen.width - width)} × ${Math.round(screen.height - height)}`}
           />
           <DiagnosticRow label="Pixel density" value={`${scale}x`} />
           <DiagnosticRow label="Font scale" value={`${fontScale}x`} />
@@ -307,6 +343,10 @@ export default function DebugScreen() {
           />
           <DiagnosticRow label="App state" value={appState} />
           <DiagnosticRow label="Current route" value={pathname} />
+          <DiagnosticRow
+            label="Route segments"
+            value={routeSegments.join("/") || "root"}
+          />
           <DiagnosticRow
             label="Window focus"
             value="Diagnostics screen active"
@@ -389,6 +429,14 @@ export default function DebugScreen() {
             value={String(storageInfo.serializedBytes)}
           />
           <DiagnosticRow
+            label="Storage read time"
+            value={storageReadMs === null ? "unknown" : `${storageReadMs} ms`}
+          />
+          <DiagnosticRow
+            label="Link override records"
+            value={String(Object.keys(linkOverrides).length)}
+          />
+          <DiagnosticRow
             label="Known app keys"
             value={storageInfo.knownKeys.join(", ") || "none"}
           />
@@ -397,6 +445,34 @@ export default function DebugScreen() {
           <DiagnosticRow
             label="Last refreshed"
             value={refreshedAt.toISOString()}
+          />
+        </Section>
+
+        <Section title="Interaction checks">
+          <DiagnosticRow
+            label="Review gaps control"
+            value="Pressable / testID quick-action-review-gaps"
+          />
+          <DiagnosticRow
+            label="Review gaps destination"
+            value="/catalog with status=Missing Link"
+          />
+          <DiagnosticRow
+            label="Status board control"
+            value="Pressable / testID quick-action-status-board"
+          />
+          <DiagnosticRow label="Status board destination" value="/statuses" />
+          <DiagnosticRow
+            label="Visual press feedback"
+            value="Opacity + scale"
+          />
+          <DiagnosticRow
+            label="Native haptic feedback"
+            value="Light impact; web-safe guard"
+          />
+          <DiagnosticRow
+            label="Labels"
+            value="Explicit absolute text bounds; one-line native-safe layout"
           />
         </Section>
 

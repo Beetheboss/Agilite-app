@@ -139,7 +139,11 @@ export default function HomeScreen() {
         <View style={styles.quickActions}>
           <View style={styles.quickActionShell}>
             <Pressable
+              testID="quick-action-review-gaps"
               accessibilityRole="button"
+              accessibilityLabel="Review gaps"
+              accessibilityHint="Opens the catalog filtered to missing links"
+              android_ripple={{ color: "#3B4B38" }}
               onPress={openGaps}
               style={({ pressed }) => [
                 styles.quickAction,
@@ -169,7 +173,11 @@ export default function HomeScreen() {
           </View>
           <View style={styles.quickActionShell}>
             <Pressable
+              testID="quick-action-status-board"
               accessibilityRole="button"
+              accessibilityLabel="Status board"
+              accessibilityHint="Opens the collection status board"
+              android_ripple={{ color: "#3B4B38" }}
               onPress={openStatuses}
               style={({ pressed }) => [
                 styles.quickAction,
@@ -356,8 +364,6 @@ const styles = StyleSheet.create({
   },
   quickActionInner: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
   },
   quickActionIcon: {
     position: "absolute",
@@ -371,13 +377,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   quickActionText: {
+    position: "absolute",
+    left: 64,
+    right: 52,
+    top: 0,
+    bottom: 0,
     color: "#F2F0E9",
     fontWeight: "700",
     fontSize: 15,
     lineHeight: 20,
     includeFontPadding: false,
+    textAlign: "center",
     textAlignVertical: "center",
-    maxWidth: "70%",
   },
   quickActionArrow: {
     position: "absolute",
