@@ -70,7 +70,7 @@ export default function HomeScreen() {
               <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="search" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Review gaps</Text>
-              <View style={styles.quickActionArrow}><MaterialIcons name="arrow-forward" size={18} color="#687274" /></View>
+              <View style={styles.quickActionArrow}><MaterialIcons name="chevron-right" size={24} color="#7C8786" /></View>
               </View>
             </Pressable>
           </View>
@@ -79,7 +79,7 @@ export default function HomeScreen() {
               <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="dashboard" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Status board</Text>
-              <View style={styles.quickActionArrow}><MaterialIcons name="arrow-forward" size={18} color="#687274" /></View>
+              <View style={styles.quickActionArrow}><MaterialIcons name="chevron-right" size={24} color="#7C8786" /></View>
               </View>
             </Pressable>
           </View>
@@ -122,12 +122,12 @@ const styles = StyleSheet.create({
   quickActionsHeader: { marginTop: 2, marginBottom: 7 },
   quickActionsLabel: { color: "#8E9A8B", textTransform: "uppercase", letterSpacing: 1.3, fontSize: 10, fontWeight: "800" },
   quickActions: { marginTop: 0, marginBottom: 13, width: "100%" },
-  quickActionShell: { width: "100%", minHeight: 44, backgroundColor: "#191D1F", borderRadius: 15, borderWidth: 1, borderColor: "#303A32", marginBottom: 6, overflow: "hidden" },
-  quickAction: { width: "100%", minHeight: 44, paddingHorizontal: 10, paddingVertical: 6, flexGrow: 0, flexShrink: 0 },
-  quickActionInner: { width: "100%", height: 32, flexDirection: "row", alignItems: "center" },
-  quickActionIcon: { width: 28, height: 28, borderRadius: 9, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  quickActionText: { flex: 1, minWidth: 0, color: "#F2F0E9", fontWeight: "700", fontSize: 13, marginLeft: 10 },
-  quickActionArrow: { width: 28, height: 32, alignItems: "flex-end", justifyContent: "center", flexShrink: 0 },
+  quickActionShell: { width: "100%", minHeight: 58, backgroundColor: "#191D1F", borderRadius: 16, borderWidth: 1, borderColor: "#303A32", marginBottom: 8, overflow: "hidden" },
+  quickAction: { width: "100%", minHeight: 58, paddingHorizontal: 14, paddingVertical: 10, flexGrow: 0, flexShrink: 0 },
+  quickActionInner: { width: "100%", height: 36, flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  quickActionIcon: { width: 36, height: 36, borderRadius: 11, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  quickActionText: { flex: 1, minWidth: 0, color: "#F2F0E9", fontWeight: "700", fontSize: 15, lineHeight: 20, marginLeft: 12 },
+  quickActionArrow: { width: 32, height: 36, alignItems: "center", justifyContent: "center", flexShrink: 0 },
   pressed: { opacity: 0.65 },
   loading: { color: "#9AA2A4", fontSize: 12, marginBottom: 10 },
   attentionList: { width: "100%" },
