@@ -27,7 +27,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
           APK_NAME: ${{ inputs.apk_name }}
-        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK_NAME" --dir "$GITHUB_WORKSPACE/emulator-apk"
+        run: |
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK_NAME" --dir "$GITHUB_WORKSPACE/emulator-apk"
+          APK_PATH="$GITHUB_WORKSPACE/emulator-apk/$APK_NAME"
+          test -f "$APK_PATH"
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+          ls -lh "$APK_PATH"
 
       - name: Run APK on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -40,11 +45,12 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-snapshot-load
           disable-animations: true
           script: |
-            APK=$(find "$GITHUB_WORKSPACE/emulator-apk" -type f -name '*.apk' -print -quit)
-            test -n "$APK"
+            test -n "$APK_PATH"
+            test -f "$APK_PATH"
+            echo "Installing $APK_PATH"
             timeout 90s adb wait-for-device
             timeout 90s adb shell getprop sys.boot_completed
-            timeout 90s adb install -r "$APK"
+            timeout 90s adb install -r "$APK_PATH"
             adb shell am force-stop com.app.agilitecollectiontracker
             adb shell monkey -p com.app.agilitecollectiontracker 1
             sleep 5
