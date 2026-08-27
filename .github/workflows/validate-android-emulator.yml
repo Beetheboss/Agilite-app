@@ -32,18 +32,18 @@ jobs:
       - name: Run APK on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          profile: pixel_2
+          api-level: 30
+          target: default
+          arch: x86
+          profile: Nexus 5
           force-avd-creation: true
-          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-snapshot-load
           disable-animations: true
           script: |
             APK=$(find emulator-apk -type f -name '*.apk' -print -quit)
             test -n "$APK"
             timeout 90s adb wait-for-device
-            timeout 90s bash -c 'until [ "$(adb shell getprop sys.boot_completed | tr -d "\\r")" = "1" ]; do sleep 2; done'
+            timeout 90s adb shell getprop sys.boot_completed
             timeout 90s adb install -r "$APK"
             adb shell am force-stop com.app.agilitecollectiontracker
             adb shell monkey -p com.app.agilitecollectiontracker 1
