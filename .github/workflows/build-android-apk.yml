@@ -77,7 +77,7 @@ jobs:
       - name: Bundle current JavaScript for Android
         working-directory: android
         run: |
-          ./gradlew :app:bundleReleaseJsAndAssets --no-daemon --stacktrace --console=plain --max-workers=2
+          ./gradlew :app:createBundleReleaseJsAndAssets --no-daemon --stacktrace --console=plain --max-workers=2
           BUNDLE=$(find app/build/generated app/build/intermediates -type f -name index.android.bundle -print -quit)
           test -n "$BUNDLE"
           grep -q "${GITHUB_SHA:0:7}" "$BUNDLE"
