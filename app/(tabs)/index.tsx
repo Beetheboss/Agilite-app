@@ -8,6 +8,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { ScreenHeader } from "@/components/screen-header";
 import { countStatuses } from "@/lib/catalog";
 import { useCollectionStore } from "@/lib/collection-store";
+import { haptic } from "@/lib/haptics";
 
 export default function HomeScreen() {
   const { records, statuses, ready } = useCollectionStore();
@@ -18,6 +19,14 @@ export default function HomeScreen() {
   );
   const completion = counts.Owned + counts.Verified;
   const percent = records.length ? Math.round((completion / records.length) * 100) : 0;
+  const openGaps = () => {
+    haptic.light();
+    router.push({ pathname: "/catalog" as any, params: { status: "Missing Link" } });
+  };
+  const openStatuses = () => {
+    haptic.light();
+    router.push("/statuses" as any);
+  };
 
   return (
     <ScreenContainer containerClassName="bg-background">
@@ -66,7 +75,7 @@ export default function HomeScreen() {
         </View>
         <View style={styles.quickActions}>
           <View style={styles.quickActionShell}>
-            <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/catalog" as any, params: { status: "Missing Link" } })} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
+            <Pressable accessibilityRole="button" onPress={openGaps} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
               <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="search" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Review gaps</Text>
@@ -75,7 +84,7 @@ export default function HomeScreen() {
             </Pressable>
           </View>
           <View style={styles.quickActionShell}>
-            <Pressable accessibilityRole="button" onPress={() => router.push("/statuses" as any)} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
+            <Pressable accessibilityRole="button" onPress={openStatuses} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
               <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="dashboard" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Status board</Text>
@@ -128,7 +137,7 @@ const styles = StyleSheet.create({
   quickActionIcon: { width: 36, height: 36, borderRadius: 11, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   quickActionText: { flex: 1, minWidth: 0, color: "#F2F0E9", fontWeight: "700", fontSize: 15, lineHeight: 20, marginLeft: 12 },
   quickActionArrow: { width: 32, height: 36, alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  pressed: { opacity: 0.65 },
+  pressed: { opacity: 0.84, transform: [{ scale: 0.985 }] },
   loading: { color: "#9AA2A4", fontSize: 12, marginBottom: 10 },
   attentionList: { width: "100%" },
   empty: { alignItems: "center", paddingVertical: 28, backgroundColor: "#191D1F", borderRadius: 18, borderWidth: 1, borderColor: "#303A32", marginTop: 3 },
