@@ -23,8 +23,9 @@ adaptive_canvas = Image.new("RGB", (canvas_size, canvas_size), background)
 adaptive_art = source.resize((760, 760), Image.Resampling.LANCZOS)
 adaptive_canvas.paste(adaptive_art, ((canvas_size - adaptive_art.width) // 2, (canvas_size - adaptive_art.height) // 2))
 
-# The in-app header can use more of the safe canvas while retaining the entire mark.
-header_crop = source.crop((120, 100, 1800, 1800)).resize((canvas_size, canvas_size), Image.Resampling.LANCZOS)
+# The in-app header renders at roughly 56px, so a 512px copy is sufficient
+# and keeps the project checkpoint comfortably below its media-file limit.
+header_crop = source.crop((120, 100, 1800, 1800)).resize((512, 512), Image.Resampling.LANCZOS)
 
 images = {
     OUTPUTS["icon"]: full_canvas,

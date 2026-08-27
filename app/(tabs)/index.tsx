@@ -50,29 +50,33 @@ export default function HomeScreen() {
 
         <SectionLabel eyebrow="At a glance" title="Collection status" />
         <View style={styles.metricsRow}>
-          <MetricCard label="Owned" value={counts.Owned} tint="#A8D46F" icon="check-circle" />
-          <MetricCard label="Verified" value={counts.Verified} tint="#8DC6A3" icon="verified" />
+          <View style={styles.metricSlot}><MetricCard label="Owned" value={counts.Owned} tint="#A8D46F" icon="check-circle" /></View>
+          <View style={styles.metricSlot}><MetricCard label="Verified" value={counts.Verified} tint="#8DC6A3" icon="verified" /></View>
         </View>
         <View style={styles.metricsRow}>
-          <MetricCard label="Missing link" value={counts["Missing Link"]} tint="#E2B15B" icon="link-off" />
-          <MetricCard label="Not found" value={counts["Not Found"]} tint="#D9827A" icon="help-outline" />
+          <View style={styles.metricSlot}><MetricCard label="Missing link" value={counts["Missing Link"]} tint="#E2B15B" icon="link-off" /></View>
+          <View style={styles.metricSlot}><MetricCard label="Not found" value={counts["Not Found"]} tint="#D9827A" icon="help-outline" /></View>
         </View>
 
         <View style={styles.quickActions}>
-          <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/catalog" as any, params: { status: "Missing Link" } })} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
-            <View style={styles.quickActionInner}>
+          <View style={styles.quickActionShell}>
+            <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/catalog" as any, params: { status: "Missing Link" } })} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
+              <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="search" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Review gaps</Text>
               <MaterialIcons name="arrow-forward" size={18} color="#687274" />
-            </View>
-          </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => router.push("/statuses" as any)} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
-            <View style={styles.quickActionInner}>
+              </View>
+            </Pressable>
+          </View>
+          <View style={styles.quickActionShell}>
+            <Pressable accessibilityRole="button" onPress={() => router.push("/statuses" as any)} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
+              <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="dashboard" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Status board</Text>
               <MaterialIcons name="arrow-forward" size={18} color="#687274" />
-            </View>
-          </Pressable>
+              </View>
+            </Pressable>
+          </View>
         </View>
 
         <SectionLabel eyebrow="Needs attention" title="Continue cataloging" action="See all" onAction={() => router.push({ pathname: "/catalog" as any, params: { status: "Missing Link" } })} />
@@ -110,8 +114,10 @@ const styles = StyleSheet.create({
   heroRingLabel: { color: "#9AA2A4", fontSize: 10, fontWeight: "700" },
   heroCaption: { color: "#A7B0A8", fontSize: 12, lineHeight: 17, marginTop: 11 },
   metricsRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  metricSlot: { width: "48.5%", flexGrow: 0, flexShrink: 0 },
   quickActions: { marginTop: 4, marginBottom: 22, width: "100%" },
-  quickAction: { width: "100%", minHeight: 52, flexGrow: 0, flexShrink: 0, backgroundColor: "#191D1F", borderRadius: 16, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: "#303A32", marginBottom: 8 },
+  quickActionShell: { width: "100%", minHeight: 52, backgroundColor: "#191D1F", borderRadius: 16, borderWidth: 1, borderColor: "#303A32", marginBottom: 8, overflow: "hidden" },
+  quickAction: { width: "100%", minHeight: 52, paddingHorizontal: 12, paddingVertical: 10, flexGrow: 0, flexShrink: 0 },
   quickActionInner: { width: "100%", minHeight: 30, flexDirection: "row", alignItems: "center" },
   quickActionIcon: { width: 32, height: 32, borderRadius: 10, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   quickActionText: { flex: 1, color: "#F2F0E9", fontWeight: "700", fontSize: 13, marginLeft: 11 },
