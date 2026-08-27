@@ -123,7 +123,15 @@ jobs:
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-x86.png"
             adb shell input swipe 540 1500 540 650 600
             sleep 3
-            adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-quick-actions-x86.png"
+            adb.exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-quick-actions-x86.png"
+            adb shell input tap 540 1115
+            sleep 3
+            adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-review-gaps-target-x86.png"
+            adb shell input keyevent 4
+            sleep 2
+            adb shell input tap 540 1265
+            sleep 3
+            adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-status-board-target-x86.png"
 
       - name: Upload native emulator evidence
         uses: actions/upload-artifact@v4
@@ -132,6 +140,8 @@ jobs:
           path: |
             native-dashboard-x86.png
             native-dashboard-quick-actions-x86.png
+            native-review-gaps-target-x86.png
+            native-status-board-target-x86.png
             native-window-dump.txt
             native-logcat.txt
           if-no-files-found: error
