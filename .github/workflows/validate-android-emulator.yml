@@ -32,7 +32,7 @@ jobs:
       - name: Run APK on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 29
           target: default
           arch: x86
           profile: Nexus 5
