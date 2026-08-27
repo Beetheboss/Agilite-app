@@ -4,6 +4,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { router } from "expo-router";
 
 import { ScreenContainer } from "@/components/screen-container";
+import { ScreenHeader } from "@/components/screen-header";
 import { COLLECTION_STATUSES, statusColors } from "@/lib/catalog";
 import { useCollectionStore } from "@/lib/collection-store";
 
@@ -12,11 +13,14 @@ export default function SettingsScreen() {
   const buildVersion = Constants.expoConfig?.version ?? "unknown";
   const confirmReset = () => Alert.alert("Reset catalog?", "This removes your local status changes and restores the imported starting catalog.", [{ text: "Cancel", style: "cancel" }, { text: "Reset", style: "destructive", onPress: () => void reset() }]);
   return (
-    <ScreenContainer className="px-5">
+    <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text style={styles.kicker}>LOCAL STORAGE</Text>
-        <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>Simple controls for your private collection log.  •  Build {buildVersion}</Text>
+        <ScreenHeader
+          inset={false}
+          eyebrow="LOCAL STORAGE"
+          title="Settings"
+          subtitle={`Simple controls for your private collection log.  •  Build ${buildVersion}`}
+        />
         <View style={styles.card}>
           <View style={styles.cardHeader}><View style={styles.iconBox}><MaterialIcons name="inventory-2" size={19} color="#A8D46F" /></View><View style={styles.cardHeaderText}><Text style={styles.cardTitle}>Imported catalog</Text><Text style={styles.cardCaption}>Agilite collectible merchandise</Text></View></View>
           <View style={styles.detail}><Text style={styles.detailLabel}>Records</Text><Text style={styles.detailValue}>{records.length}</Text></View>
@@ -40,10 +44,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: 0, paddingTop: 22, paddingBottom: 44 },
-  kicker: { color: "#81927B", fontSize: 10, fontWeight: "800", letterSpacing: 1.6, marginBottom: 7 },
-  title: { color: "#F2F0E9", fontSize: 30, lineHeight: 36, fontWeight: "800", letterSpacing: -0.9 },
-  subtitle: { color: "#9AA2A4", fontSize: 13, lineHeight: 19, marginTop: 8, marginBottom: 24 },
+  content: { paddingHorizontal: 20, paddingTop: 22, paddingBottom: 44 },
   card: { backgroundColor: "#191D1F", borderRadius: 18, borderWidth: 1, borderColor: "#303A32", paddingHorizontal: 14, marginBottom: 26 },
   cardHeader: { flexDirection: "row", alignItems: "center", paddingVertical: 15 },
   iconBox: { width: 36, height: 36, borderRadius: 11, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center" },

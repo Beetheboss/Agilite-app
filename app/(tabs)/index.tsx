@@ -5,6 +5,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 
 import { CollectionRow, MetricCard, ProgressBar, SectionLabel, StatusBadge } from "@/components/catalog-ui";
 import { ScreenContainer } from "@/components/screen-container";
+import { ScreenHeader } from "@/components/screen-header";
 import { countStatuses } from "@/lib/catalog";
 import { useCollectionStore } from "@/lib/collection-store";
 
@@ -25,15 +26,17 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.topBar}>
-          <View>
-            <Text style={styles.kicker}>PERSONAL FIELD LOG</Text>
-            <Text style={styles.title}>Collection tracker</Text>
-          </View>
-          <View style={styles.logoMark}>
-            <Image source={require("../../assets/images/header-logo.png")} style={styles.logoImage} resizeMode="contain" />
-          </View>
-        </View>
+        <ScreenHeader
+          inset={false}
+          eyebrow="PERSONAL FIELD LOG"
+          title="Collection tracker"
+          accessory={
+            <View style={styles.logoMark}>
+              <Image source={require("../../assets/images/header-logo.png")} style={styles.logoImage} resizeMode="contain" />
+            </View>
+          }
+          style={styles.dashboardHeader}
+        />
 
         <View style={styles.heroCard}>
           <View style={styles.heroGlow} />
@@ -67,7 +70,7 @@ export default function HomeScreen() {
               <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="search" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Review gaps</Text>
-              <MaterialIcons name="arrow-forward" size={18} color="#687274" />
+              <View style={styles.quickActionArrow}><MaterialIcons name="arrow-forward" size={18} color="#687274" /></View>
               </View>
             </Pressable>
           </View>
@@ -76,7 +79,7 @@ export default function HomeScreen() {
               <View style={styles.quickActionInner}>
               <View style={styles.quickActionIcon}><MaterialIcons name="dashboard" size={18} color="#A8D46F" /></View>
               <Text style={styles.quickActionText}>Status board</Text>
-              <MaterialIcons name="arrow-forward" size={18} color="#687274" />
+              <View style={styles.quickActionArrow}><MaterialIcons name="arrow-forward" size={18} color="#687274" /></View>
               </View>
             </Pressable>
           </View>
@@ -102,9 +105,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingTop: 14, paddingBottom: 32, paddingHorizontal: 20 },
-  topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 },
-  kicker: { color: "#81927B", fontSize: 10, fontWeight: "800", letterSpacing: 1.6, marginBottom: 6 },
-  title: { color: "#F2F0E9", fontSize: 30, lineHeight: 36, fontWeight: "800", letterSpacing: -0.9 },
+  dashboardHeader: { marginBottom: 14 },
   logoMark: { width: 56, height: 56, borderRadius: 18, backgroundColor: "#1A231D", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "#3E4A3A", overflow: "hidden" },
   logoImage: { width: 54, height: 54 },
   heroCard: { backgroundColor: "#243025", borderRadius: 22, padding: 15, overflow: "hidden", borderWidth: 1, borderColor: "#405039", marginBottom: 14 },
@@ -123,9 +124,10 @@ const styles = StyleSheet.create({
   quickActions: { marginTop: 0, marginBottom: 13, width: "100%" },
   quickActionShell: { width: "100%", minHeight: 44, backgroundColor: "#191D1F", borderRadius: 15, borderWidth: 1, borderColor: "#303A32", marginBottom: 6, overflow: "hidden" },
   quickAction: { width: "100%", minHeight: 44, paddingHorizontal: 10, paddingVertical: 6, flexGrow: 0, flexShrink: 0 },
-  quickActionInner: { width: "100%", minHeight: 30, flexDirection: "row", alignItems: "center" },
+  quickActionInner: { width: "100%", height: 32, flexDirection: "row", alignItems: "center" },
   quickActionIcon: { width: 28, height: 28, borderRadius: 9, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  quickActionText: { flex: 1, color: "#F2F0E9", fontWeight: "700", fontSize: 13, marginLeft: 10 },
+  quickActionText: { flex: 1, minWidth: 0, color: "#F2F0E9", fontWeight: "700", fontSize: 13, marginLeft: 10 },
+  quickActionArrow: { width: 28, height: 32, alignItems: "flex-end", justifyContent: "center", flexShrink: 0 },
   pressed: { opacity: 0.65 },
   loading: { color: "#9AA2A4", fontSize: 12, marginBottom: 10 },
   attentionList: { width: "100%" },
