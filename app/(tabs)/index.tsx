@@ -19,7 +19,7 @@ export default function HomeScreen() {
   const percent = records.length ? Math.round((completion / records.length) * 100) : 0;
 
   return (
-    <ScreenContainer containerClassName="bg-background" className="px-5">
+    <ScreenContainer containerClassName="bg-background">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
@@ -98,7 +98,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { paddingTop: 22, paddingBottom: 42 },
+  content: { paddingTop: 22, paddingBottom: 42, paddingHorizontal: 20 },
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 22 },
   kicker: { color: "#81927B", fontSize: 10, fontWeight: "800", letterSpacing: 1.6, marginBottom: 6 },
   title: { color: "#F2F0E9", fontSize: 30, lineHeight: 36, fontWeight: "800", letterSpacing: -0.9 },
@@ -115,11 +115,11 @@ const styles = StyleSheet.create({
   heroCaption: { color: "#A7B0A8", fontSize: 12, lineHeight: 17, marginTop: 11 },
   metricsRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
   metricSlot: { width: "48.5%", flexGrow: 0, flexShrink: 0 },
-  quickActions: { marginTop: 4, marginBottom: 22, width: "100%" },
-  quickActionShell: { width: "100%", minHeight: 52, backgroundColor: "#191D1F", borderRadius: 16, borderWidth: 1, borderColor: "#303A32", marginBottom: 8, overflow: "hidden" },
-  quickAction: { width: "100%", minHeight: 52, paddingHorizontal: 12, paddingVertical: 10, flexGrow: 0, flexShrink: 0 },
+  quickActions: { marginTop: 4, marginBottom: 18, width: "100%" },
+  quickActionShell: { width: "100%", minHeight: 48, backgroundColor: "#191D1F", borderRadius: 16, borderWidth: 1, borderColor: "#303A32", marginBottom: 8, overflow: "hidden" },
+  quickAction: { width: "100%", minHeight: 48, paddingHorizontal: 12, paddingVertical: 8, flexGrow: 0, flexShrink: 0 },
   quickActionInner: { width: "100%", minHeight: 30, flexDirection: "row", alignItems: "center" },
-  quickActionIcon: { width: 32, height: 32, borderRadius: 10, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  quickActionIcon: { width: 30, height: 30, borderRadius: 10, backgroundColor: "#28352A", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   quickActionText: { flex: 1, color: "#F2F0E9", fontWeight: "700", fontSize: 13, marginLeft: 11 },
   pressed: { opacity: 0.65 },
   loading: { color: "#9AA2A4", fontSize: 12, marginBottom: 10 },

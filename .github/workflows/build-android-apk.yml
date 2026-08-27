@@ -76,19 +76,43 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Generate automated release notes
+        id: release-meta
+        run: |
+          set -euo pipefail
+          VERSION=$(sed -n 's/.*version: "\([^" ]*\)".*/\1/p' app.config.ts | head -1)
+          VERSION_CODE=$(sed -n 's/.*versionCode: \([0-9]*\).*/\1/p' app.config.ts | head -1)
+          PACKAGE=$(sed -n "s/.*applicationId '\([^']*\)'.*/\1/p" android/app/build.gradle | head -1)
+          TAG="agilite-tracker-v${VERSION}-build-${GITHUB_RUN_NUMBER}"
+          APK_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${TAG}/app-release.apk"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+          {
+            echo "# Agilite Tracker ${VERSION}"
+            echo
+            echo "Direct Android APK for personal use."
+            echo
+            echo "| Build field | Value |"
+            echo "|---|---|"
+            echo "| App version | ${VERSION} |"
+            echo "| Android versionCode | ${VERSION_CODE} |"
+            echo "| Package | ${PACKAGE} |"
+            echo "| Signing status | Persistent repository signing enabled |"
+            echo "| Target ABI | arm64-v8a |"
+            echo "| Commit | [${GITHUB_SHA:0:7}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}) |"
+            echo "| Workflow run | [Run #${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) |"
+            echo
+            echo "**Direct download:** [app-release.apk](${APK_URL})"
+          } > release-notes.md
+          cat release-notes.md
+
       - name: Publish APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: agilite-tracker-v1.0.6-build-${{ github.run_number }}
-          name: Agilite Tracker 1.0.6 (Build ${{ github.run_number }})
-          body: |
-            Direct Android APK for personal use.
-
-            - Download `app-release.apk` below; it is not wrapped in a ZIP.
-            - Target ABI: arm64-v8a.
-            - Package: `com.app.agilitecollectiontracker`.
-            - Version: 1.0.6 / Android versionCode 7.
-            - This build uses the repository-managed signing key so future builds can install as upgrades.
+          tag_name: agilite-tracker-v${{ steps.release-meta.outputs.version }}-build-${{ github.run_number }}
+          name: Agilite Tracker ${{ steps.release-meta.outputs.version }} (Build ${{ github.run_number }})
+          body_path: release-notes.md
           files: android/app/build/outputs/apk/release/app-release.apk
           fail_on_unmatched_files: true
         env:
@@ -96,7 +120,7 @@ jobs:
 
       - name: Write direct download URL
         run: |
-          echo "https://github.com/${{ github.repository }}/releases/download/agilite-tracker-v1.0.6-build-${{ github.run_number }}/app-release.apk" > direct-apk-url.txt
+          echo "https://github.com/${{ github.repository }}/releases/download/agilite-tracker-v${{ steps.release-meta.outputs.version }}-build-${{ github.run_number }}/app-release.apk" > direct-apk-url.txt
           cat direct-apk-url.txt
 
       - name: Upload direct URL note
@@ -110,5 +134,5 @@ jobs:
         run: |
           {
             echo "### Direct APK download"
-            echo "https://github.com/${{ github.repository }}/releases/download/agilite-tracker-v1.0.6-build-${{ github.run_number }}/app-release.apk"
+            echo "https://github.com/${{ github.repository }}/releases/download/agilite-tracker-v${{ steps.release-meta.outputs.version }}-build-${{ github.run_number }}/app-release.apk"
           } >> "$GITHUB_STEP_SUMMARY"
