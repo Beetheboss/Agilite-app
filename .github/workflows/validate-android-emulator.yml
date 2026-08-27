@@ -27,7 +27,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
           APK_NAME: ${{ inputs.apk_name }}
-        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK_NAME" --dir emulator-apk
+        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK_NAME" --dir "$GITHUB_WORKSPACE/emulator-apk"
 
       - name: Run APK on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -40,7 +40,7 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-snapshot-load
           disable-animations: true
           script: |
-            APK=$(find emulator-apk -type f -name '*.apk' -print -quit)
+            APK=$(find "$GITHUB_WORKSPACE/emulator-apk" -type f -name '*.apk' -print -quit)
             test -n "$APK"
             timeout 90s adb wait-for-device
             timeout 90s adb shell getprop sys.boot_completed
