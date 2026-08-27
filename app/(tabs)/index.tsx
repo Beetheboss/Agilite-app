@@ -58,6 +58,9 @@ export default function HomeScreen() {
           <View style={styles.metricSlot}><MetricCard label="Not found" value={counts["Not Found"]} tint="#D9827A" icon="help-outline" /></View>
         </View>
 
+        <View style={styles.quickActionsHeader}>
+          <Text style={styles.quickActionsLabel}>Quick actions</Text>
+        </View>
         <View style={styles.quickActions}>
           <View style={styles.quickActionShell}>
             <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/catalog" as any, params: { status: "Missing Link" } })} style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}>
@@ -115,6 +118,8 @@ const styles = StyleSheet.create({
   heroCaption: { color: "#A7B0A8", fontSize: 12, lineHeight: 16, marginTop: 7 },
   metricsRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
   metricSlot: { width: "48.5%", flexGrow: 0, flexShrink: 0 },
+  quickActionsHeader: { marginTop: 2, marginBottom: 7 },
+  quickActionsLabel: { color: "#8E9A8B", textTransform: "uppercase", letterSpacing: 1.3, fontSize: 10, fontWeight: "800" },
   quickActions: { marginTop: 0, marginBottom: 13, width: "100%" },
   quickActionShell: { width: "100%", minHeight: 44, backgroundColor: "#191D1F", borderRadius: 15, borderWidth: 1, borderColor: "#303A32", marginBottom: 6, overflow: "hidden" },
   quickAction: { width: "100%", minHeight: 44, paddingHorizontal: 10, paddingVertical: 6, flexGrow: 0, flexShrink: 0 },

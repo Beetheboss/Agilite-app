@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   badgeDot: { width: 6, height: 6, borderRadius: 6, marginRight: 6 },
   badgeText: { fontSize: 12, fontWeight: "700", letterSpacing: 0.1 },
   badgeTextCompact: { fontSize: 10 },
-  metricCard: { width: "100%", backgroundColor: "#191D1F", borderRadius: 18, padding: 10, flexGrow: 0, flexShrink: 0, borderWidth: 1, borderColor: "#303A32" },
+  metricCard: { width: "100%", minHeight: 102, backgroundColor: "#191D1F", borderRadius: 18, padding: 10, flexGrow: 0, flexShrink: 0, justifyContent: "flex-start", borderWidth: 1, borderColor: "#303A32" },
   metricIcon: { width: 28, height: 28, borderRadius: 9, alignItems: "center", justifyContent: "center", marginBottom: 6 },
   metricValue: { color: "#F2F0E9", fontSize: 22, lineHeight: 26, fontWeight: "800", letterSpacing: -0.5 },
   metricLabel: { color: "#9AA2A4", fontSize: 11, lineHeight: 14, marginTop: 2, fontWeight: "600" },
