@@ -1,0 +1,57 @@
+name: Validate Android APK in emulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: GitHub Release tag to validate
+        required: true
+        default: agilite-tracker-v1.0.6-build-21
+      apk_name:
+        description: APK asset filename on that release
+        required: true
+        default: AgiliteTracker-1.0.6-build-21.apk
+
+permissions:
+  contents: read
+
+jobs:
+  validate-native-android:
+    name: Validate APK in Android emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Download selected Release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          APK_NAME: ${{ inputs.apk_name }}
+        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "$APK_NAME" --dir emulator-apk
+
+      - name: Run APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          force-avd-creation: true
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          disable-animations: true
+          script: |
+            APK=$(find emulator-apk -type f -name '*.apk' -print -quit)
+            test -n "$APK"
+            adb install -r "$APK"
+            adb shell am force-stop com.app.agilitecollectiontracker
+            adb shell monkey -p com.app.agilitecollectiontracker 1
+            sleep 5
+            adb exec-out screencap -p > native-dashboard.png
+
+      - name: Upload native emulator screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: agilite-tracker-native-dashboard-screenshot
+          path: native-dashboard.png
+          if-no-files-found: error
+          retention-days: 30
