@@ -104,6 +104,10 @@ jobs:
             echo "| Workflow run | [Run #${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) |"
             echo
             echo "**Direct download:** [app-release.apk](${APK_URL})"
+            echo
+            echo "## Changelog"
+            echo
+            sed -n '/^## \[1\.0\.6\]/,$p' CHANGELOG.md
           } > release-notes.md
           cat release-notes.md
 
