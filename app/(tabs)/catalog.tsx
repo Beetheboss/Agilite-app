@@ -28,7 +28,7 @@ export default function CatalogScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         ListHeaderComponent={
-          <View>
+          <View style={styles.headerContent}>
             <Text style={styles.kicker}>LOCAL CATALOG</Text>
             <View style={styles.titleRow}><Text style={styles.title}>All collectibles</Text><Text style={styles.count}>{filtered.length}</Text></View>
             <View style={styles.searchBox}><MaterialIcons name="search" size={20} color="#687274" /><TextInput value={query} onChangeText={setQuery} placeholder="Search names, SKUs, categories" placeholderTextColor="#687274" style={styles.searchInput} returnKeyType="done" /></View>
@@ -47,6 +47,7 @@ export default function CatalogScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingTop: 22, paddingBottom: 42 },
+  headerContent: { paddingHorizontal: 20 },
   kicker: { color: "#81927B", fontSize: 10, fontWeight: "800", letterSpacing: 1.6, marginBottom: 7 },
   titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },
   title: { color: "#F2F0E9", fontSize: 30, lineHeight: 36, fontWeight: "800", letterSpacing: -0.9 },
