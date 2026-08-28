@@ -124,12 +124,12 @@ jobs:
             adb shell input swipe 540 1500 540 650 600
             sleep 3
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-dashboard-quick-actions-x86.png"
-            adb shell input tap 540 1115
+            adb shell input tap 540 950
             sleep 3
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-review-gaps-target-x86.png"
             adb shell input keyevent 4
             sleep 2
-            adb shell input tap 540 1265
+            adb shell input tap 540 1110
             sleep 3
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/native-status-board-target-x86.png"
 
